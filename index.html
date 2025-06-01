@@ -883,7 +883,44 @@
             showAlert('createAlert', result.message, false);
         }
     });
+function exportToExcel() {
+    const table = document.getElementById("workersTable");
+    const htmlTable = table.cloneNode(true); // نسخ الجدول الأصلي
+    const newHeader = document.createElement("tr");
 
+    // إضافة صف عنوان أعلى الجدول
+    const titleCell = document.createElement("td");
+    titleCell.setAttribute("colspan", table.rows[0].cells.length);
+    titleCell.textContent = "مكتب ماستر للاستشارات - تقرير العملاء";
+    titleCell.style.fontSize = "16px";
+    titleCell.style.fontWeight = "bold";
+    titleCell.style.textAlign = "center";
+
+    const headerRow = htmlTable.querySelector("thead tr");
+    headerRow.parentNode.insertBefore(newHeader, headerRow);
+    const titleRow = document.createElement("tr");
+    const titleCellWrapper = document.createElement("td");
+    titleCellWrapper.setAttribute("colspan", table.rows[0].cells.length);
+    titleCellWrapper.appendChild(titleCell);
+    titleRow.appendChild(titleCellWrapper);
+    headerRow.parentNode.insertBefore(titleRow, headerRow);
+
+    // إضافة تاريخ التصدير
+    const dateRow = document.createElement("tr");
+    const dateCell = document.createElement("td");
+    dateCell.setAttribute("colspan", table.rows[0].cells.length);
+    dateCell.textContent = `تاريخ التصدير: ${new Date().toLocaleString()}`;
+    dateCell.style.fontSize = "12px";
+    dateCell.style.color = "#888";
+    dateRow.appendChild(dateCell);
+    headerRow.parentNode.insertBefore(dateRow, headerRow.nextSibling);
+
+    // تحويل الجدول إلى ورقة عمل Excel
+    const ws = XLSX.utils.table_to_sheet(htmlTable);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "تقرير العملاء");
+    XLSX.writeFile(wb, `تقرير_العملاء_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
     // تعديل العميل
     function editWorker(workerId) {
         const currentUser = dataManager.getCurrentUser();
